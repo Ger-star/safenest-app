@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SafeNest Smart Control</title>
-    <!-- Подключаем Firebase, Шрифты FontAwesome и Графики Chart.js -->
+    <title>SafeNest v1.0 Smart Control</title>
+    <!-- Подключаем Telegram WebApp API, Firebase, Иконки и Графики -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -46,7 +47,6 @@
             border: 1px solid var(--border-color);
         }
 
-        /* Брендированный Хедер с Логотипом */
         .brand-header {
             display: flex;
             justify-content: space-between;
@@ -76,7 +76,6 @@
             -webkit-text-fill-color: transparent;
         }
         
-        /* Селектор языков */
         .lang-selector {
             display: flex;
             gap: 4px;
@@ -101,7 +100,6 @@
             color: var(--bg-primary);
         }
 
-        /* Системный статусный виджет */
         .sys-status {
             display: flex;
             align-items: center;
@@ -120,7 +118,6 @@
             box-shadow: 0 0 10px var(--color-safe);
         }
 
-        /* Центральный Круговой Виджет CO */
         .radial-dashboard {
             display: flex;
             flex-direction: column;
@@ -143,16 +140,11 @@
             transition: stroke-dashoffset 0.5s ease, stroke 0.5s ease;
             stroke-linecap: round;
         }
-        .gauge-center-text {
-            text-align: center; z-index: 2;
-        }
+        .gauge-center-text { text-align: center; z-index: 2; }
         .co-num { font-size: 32px; font-weight: 800; color: var(--color-safe); transition: 0.3s; }
         .co-unit { font-size: 12px; color: var(--text-muted); margin-top: -2px; font-weight: bold; }
 
-        /* Сетка климатических виджетов */
-        .widgets-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%;
-        }
+        .widgets-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
         .card {
             background: var(--bg-widget); border-radius: 16px; padding: 12px 15px;
             border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 4px;
@@ -161,19 +153,20 @@
         .card-lbl { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
         .card-val { font-size: 20px; font-weight: 700; color: var(--text-main); }
 
-        /* Панель органов управления */
-        .control-panel {
-            display: flex; flex-direction: column; gap: 10px; margin-top: 20px; width: 100%;
-        }
+        .control-panel { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; width: 100%; }
         .ctrl-row {
             display: flex; justify-content: space-between; align-items: center;
+            background: var(--bg-widget); padding: 12px 16px; border-radius: 14px;
+            border: 1px solid var(--border-color);
+        }
+        .ctrl-column {
+            display: flex; flex-direction: column; gap: 8px;
             background: var(--bg-widget); padding: 12px 16px; border-radius: 14px;
             border: 1px solid var(--border-color);
         }
         .ctrl-info { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500; }
         .ctrl-info i { color: var(--text-muted); width: 16px; text-align: center; }
 
-        /* Кастомные переключатели (Toggles) */
         .switch { position: relative; display: inline-block; width: 42px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider {
@@ -187,9 +180,8 @@
         input:checked + .slider { background-color: var(--color-accent); }
         input:checked + .slider:before { transform: translateX(18px); }
 
-        /* Ползунок Слайдера Порога */
         .range-slider {
-            -webkit-appearance: none; width: 100px; height: 6px;
+            -webkit-appearance: none; width: 110px; height: 6px;
             background: #2d2d3d; border-radius: 3px; outline: none;
         }
         .range-slider::-webkit-slider-thumb {
@@ -197,7 +189,17 @@
             border-radius: 50%; background: var(--color-accent); cursor: pointer;
         }
 
-        /* Кнопки действий */
+        .siren-selector {
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; width: 100%; margin-top: 4px;
+        }
+        .siren-btn {
+            background: #2d2d3d; color: var(--text-muted); border: 1px solid var(--border-color);
+            padding: 8px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s;
+        }
+        .siren-btn.active {
+            background: rgba(56, 189, 248, 0.15); color: var(--color-accent); border-color: var(--color-accent);
+        }
+
         .action-btn {
             background: var(--bg-widget); color: var(--text-main); border: 1px solid var(--border-color);
             padding: 12px; border-radius: 14px; font-weight: 600; font-size: 14px; cursor: pointer;
@@ -208,7 +210,6 @@
         .btn-panic { border-color: rgba(239, 68, 68, 0.3); }
         .btn-panic i { color: var(--color-danger); }
 
-        /* График */
         .chart-wrapper {
             background: var(--bg-widget); border-radius: 16px; padding: 12px;
             border: 1px solid var(--border-color); margin-top: 15px; width: 100%; box-sizing: border-box;
@@ -218,14 +219,13 @@
 <body>
 
 <div class="app-container">
-    <!-- Хедер с логотипом и выбором языков -->
     <div class="brand-header">
         <div class="logo-box">
             <svg class="logo-svg" viewBox="0 0 24 24">
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                 <path d="M12 8l-4 3h2v4h4v-4h2z" fill="currentColor" stroke="none"/>
             </svg>
-            <div class="brand-name">SafeNest</div>
+            <div class="brand-name">SafeNest v1.0</div>
         </div>
         
         <div class="lang-selector">
@@ -240,7 +240,7 @@
         <div class="sys-status" style="font-size: 11px;"><i class="fa-solid fa-clock"></i> <span id="uptimeVal">0 ч.</span></div>
     </div>
 
-    <!-- Круговой Дашборд Уровня Газа -->
+    <!-- Дашборд газа -->
     <div class="radial-dashboard">
         <div class="gauge-window">
             <svg class="gauge-svg" width="180" height="180">
@@ -274,7 +274,7 @@
         <span id="hiValue" class="card-val">--.- °C</span>
     </div>
 
-    <!-- Органы управления -->
+    <!-- Панель управления -->
     <div class="control-panel">
         <div class="ctrl-row">
             <div class="ctrl-info"><i class="fa-solid fa-volume-xmark"></i> <span id="lbl_mute">Глушить сирену (Mute)</span></div>
@@ -305,6 +305,15 @@
             <input type="range" id="threshSlider" class="range-slider" min="10" max="500" value="100" onchange="writeControl('threshold', parseFloat(this.value))">
         </div>
 
+        <div class="ctrl-column">
+            <div class="ctrl-info"><i class="fa-solid fa-music"></i> <span id="lbl_siren_select">Тональность дабыла / Звук сирены:</span></div>
+            <div class="siren-selector">
+                <button class="siren-btn" id="siren_0" onclick="writeControl('siren_mode', 0)">Стандарт</button>
+                <button class="siren-btn" id="siren_1" onclick="writeControl('siren_mode', 1)">Полиция</button>
+                <button class="siren-btn" id="siren_2" onclick="writeControl('siren_mode', 2)">Клик</button>
+            </div>
+        </div>
+
         <button class="action-btn" onclick="triggerSnap()">
             <i class="fa-solid fa-camera"></i> <span id="lbl_btn_photo">Запросить экспресс-фото</span>
         </button>
@@ -321,35 +330,44 @@
 </div>
 
 <script>
-// Подключение к Realtime Database
 const firebaseConfig = { databaseURL: "https://safenest2508-default-rtdb.firebaseio.com/" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 let currentLang = 1;
 let current_t = 0, current_h = 0, current_co_ppm = 0, heat_index = 0, CO_PPM_THRESHOLD = 100;
-let isMuted = false, lcdBacklightOn = true, carouselEnabled = true;
+let isMuted = false, lcdBacklightOn = true, carouselEnabled = true, sirenMode = 0;
 
-// Локализация словарей
+let userTelegramId = "";
+try {
+    if (window.Telegram && window.Telegram.WebApp) {
+        const webapp = window.Telegram.WebApp;
+        webapp.ready();
+        if (webapp.initDataUnsafe && webapp.initDataUnsafe.user) {
+            userTelegramId = webapp.initDataUnsafe.user.id.toString();
+            db.ref("control/user_tg_id").set(userTelegramId);
+        }
+    }
+} catch(e) { console.log(e); }
+
 const localization = {
     0: { // KZ
         sync: "Қосылулы", temp: "Температура", hum: "Ылғалдылық", feels: "Сезілуі (Heat Index)",
         mute: "Дабылды өшіру (Mute)", lcd: "LCD экран жарығы", carousel: "Карусель режимі (10с)",
-        thresh: "Шек:", b_photo: "Жедел фото сұрау", b_reboot: "Жүйені қайта жүктеу"
+        thresh: "Шек:", b_photo: "Жедел фото сұрау", b_reboot: "Жүйені қайта жүктеу", s_select: "Дабыл түрін таңдау:"
     },
     1: { // RU
         sync: "В сети", temp: "Температура", hum: "Влажность", feels: "Индекс тепла (Ощущается)",
         mute: "Глушить сирену (Mute)", lcd: "Подсветка LCD экрана", carousel: "Карусель экранов (10с)",
-        thresh: "Порог:", b_photo: "Запросить экспресс-фото", b_reboot: "Перезагрузить ноду SafeNest"
+        thresh: "Порог:", b_photo: "Запросить экспресс-фото", b_reboot: "Перезагрузить ноду SafeNest", s_select: "Выбор звука сирены:"
     },
     2: { // EN
         sync: "Online", temp: "Temperature", hum: "Humidity", feels: "Heat Index (Feels Like)",
         mute: "Mute Siren Buzzer", lcd: "LCD Backlight Control", carousel: "Carousel Mode (10s)",
-        thresh: "Limit:", b_photo: "Trigger Express Photo", b_reboot: "Hard Reboot SafeNest"
+        thresh: "Limit:", b_photo: "Trigger Express Photo", b_reboot: "Hard Reboot SafeNest", s_select: "Siren Sound Profile:"
     }
 };
 
-// Инициализация суточного чарта
 const chartCtx = document.getElementById('coChart').getContext('2d');
 const coChart = new Chart(chartCtx, {
     type: 'line',
@@ -374,7 +392,6 @@ const coChart = new Chart(chartCtx, {
     }
 });
 
-// Функция обновления перевода интерфейса
 function applyLocalization() {
     const lang = localization[currentLang];
     document.getElementById("lbl_sync").innerText = lang.sync;
@@ -385,6 +402,7 @@ function applyLocalization() {
     document.getElementById("lbl_lcd").innerText = lang.lcd;
     document.getElementById("lbl_carousel").innerText = lang.carousel;
     document.getElementById("lbl_thresh").innerText = lang.thresh;
+    document.getElementById("lbl_siren_select").innerText = lang.s_select;
     document.getElementById("lbl_btn_photo").innerText = lang.b_photo;
     document.getElementById("lbl_btn_reboot").innerText = lang.b_reboot;
 
@@ -395,23 +413,23 @@ function applyLocalization() {
 }
 
 function setLanguage(langIdx) {
-    currentLang = langIdx;
-    applyLocalization();
-    db.ref("control/current_lang").set(langIdx);
+    currentLang = langIdx; 
+    applyLocalization(); 
+    writeControl('current_lang', langIdx);
 }
 
-// Слушатель телеметрии от ESP32 реального времени
 db.ref("telemetry").on("value", (snapshot) => {
     const data = snapshot.val();
     if(data) {
-        current_t = data.temperature || 0;
-        current_h = data.humidity || 0;
-        current_co_ppm = data.co_ppm || 0;
+        current_t = data.temperature || 0; 
+        current_h = data.humidity || 0; 
+        current_co_ppm = data.co_ppm || 0; 
         heat_index = data.heat_index || 0;
-        CO_PPM_THRESHOLD = data.threshold || 100;
-        isMuted = data.is_muted || false;
+        CO_PPM_THRESHOLD = data.threshold || 100; 
+        isMuted = data.is_muted || false; 
         lcdBacklightOn = data.lcd_backlight !== undefined ? data.lcd_backlight : true;
-        carouselEnabled = data.carousel_enabled !== undefined ? data.carousel_enabled : true;
+        carouselEnabled = data.carousel_enabled !== undefined ? data.carousel_enabled : true; 
+        sirenMode = data.siren_mode !== undefined ? data.siren_mode : 0;
         currentLang = data.current_lang !== undefined ? data.current_lang : 1;
 
         document.getElementById("tempValue").innerText = current_t.toFixed(1) + " °C";
@@ -426,43 +444,35 @@ db.ref("telemetry").on("value", (snapshot) => {
         document.getElementById("lcdToggle").checked = lcdBacklightOn;
         document.getElementById("carouselToggle").checked = carouselEnabled;
 
+        document.querySelectorAll('.siren-btn').forEach(b => b.classList.remove('active'));
+        const activeSirenBtn = document.getElementById("siren_" + sirenMode);
+        if(activeSirenBtn) activeSirenBtn.classList.add('active');
+
         const progress = document.getElementById("gaugeFill");
-        const maxPpm = Math.max(CO_PPM_THRESHOLD, 300);
-        const ratio = Math.min(current_co_ppm / maxPpm, 1);
-        const offset = 502 - (ratio * 502);
+        const maxPadded = Math.max(CO_PPM_THRESHOLD, 300);
+        const offset = 502 - (Math.min(current_co_ppm / maxPadded, 1) * 502);
         progress.style.strokeDashoffset = offset;
 
         if (current_co_ppm >= CO_PPM_THRESHOLD) {
-            progress.style.stroke = "var(--color-danger)";
+            progress.style.stroke = "var(--color-danger)"; 
             document.getElementById("coValue").style.color = "var(--color-danger)";
         } else {
-            progress.style.stroke = "var(--color-safe)";
+            progress.style.stroke = "var(--color-safe)"; 
             document.getElementById("coValue").style.color = "var(--color-safe)";
         }
 
-        const isOnline = (Date.now() - (data.last_seen || 0)) < 8000;
-        const dot = document.getElementById("statusNode");
-        if (isOnline) dot.className = "status-dot online"; else dot.className = "status-dot";
+        firebase.database().ref(".info/serverTimeOffset").once("value", (offsetSnap) => {
+            const isOnline = ((Date.now() + (offsetSnap.val() || 0)) - (data.last_seen || 0)) < 12000;
+            document.getElementById("statusNode").className = isOnline ? "status-dot online" : "status-dot";
+        });
 
         applyLocalization();
     }
 });
 
-// Запись команд управления в Firebase
-function writeControl(node, val) {
-    db.ref("control/" + node).set(val);
-}
-
-function triggerSnap() {
-    db.ref("control/command_snap").set(true);
-    setTimeout(() => db.ref("control/command_snap").set(false), 1500);
-}
-
-function requestReboot() {
-    if(confirm(currentLang === 1 ? "Вы действительно хотите перезагрузить ноду SafeNest?" : "Reboot device?")) {
-        db.ref("control/command_reboot").set(true);
-    }
-}
+function writeControl(node, val) { db.ref("control/" + node).set(val); }
+function triggerSnap() { writeControl('command_snap', true); setTimeout(() => writeControl('command_snap', false), 1500); }
+function requestReboot() { if(confirm(currentLang === 1 ? "Перезагрузить ноду SafeNest v1.0?" : "Reboot device?")) writeControl('command_reboot', true); }
 </script>
 
 </body>
